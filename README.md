@@ -1,4 +1,4 @@
-# EEEE3112 Coursework 2
+# EEEE3112 Coursework 2 Report
 
 This repository contains the report for EEEE3112 Power Electronic Applications and Control Coursework 2.
 In this coursework, I am tasked with creating a grid connected inverter.
