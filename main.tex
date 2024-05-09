@@ -113,6 +113,29 @@ The time domain equation can be obtained by converting it from the phasor repres
 
 \section{Average Time Model}
 
+An average time model of the inverter is design.
+In this model, the inverter is modelled as a controllable voltage source.
+The inverter is then connected to the grid with the inductor calculated in between.
+Measurements of the inverter current and AC grid voltage is taken to calculate the power output.
+Figure \ref{fig:avg-time-waveform} shows the output wave forms of the inverter and the average output power.
+
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{img/Average Time Power.pdf}
+    \caption{Output Waveforms of the Average Time Model Inverter}
+    \label{fig:avg-time-waveform}
+\end{figure}
+
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{img/Average Timer Power Cursor.jpg}
+    \caption{Measurements from the Average Time Model Waveform}
+    \label{fig:avg-time-cursor}
+\end{figure}
+
+The waveforms show that the power output of the inverter matches with the calculated values.
+The average power of the inverter is around 2980 W.
+This is close to the expected power of $3000 - 1\% * 3000 = 3000 - 30 = 2970$ W.
+The difference is due to the precision of the calculated and input values to PLECS.
+
 \section{Switching Model}
 
 \section{Transfer Function Model}
