@@ -124,6 +124,14 @@ The inverter is then connected to the grid with the inductor calculated in betwe
 Measurements of the inverter current and AC grid voltage is taken to calculate the power output.
 Figure \ref{fig:avg-time-waveform} shows the output wave forms of the inverter and the average output power.
 
+\begin{figure}[ht]
+    % https://tex.stackexchange.com/questions/47245/set-a-maximum-width-and-height-for-an-image/47247
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Average Time Model.pdf}
+    \caption{PLECS Schematic for Average Time Model}
+    \label{fig:avg-time-model}
+\end{figure}
+
 The waveforms show that the power output of the inverter matches with the calculated values.
 The average power of the inverter is around 2980 W.
 This is close to the expected power of $3000 - 1\% * 3000 = 3000 - 30 = 2970$ W.
@@ -169,7 +177,7 @@ Where:
 \begin{figure}[ht]
     \centering{}
     \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Switching Model.pdf}
-    \caption{PLECS Model for the Switching Model}
+    \caption{PLECS Schematic for the Switching Model}
     \label{fig:switching-model}
 \end{figure}
 
