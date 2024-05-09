@@ -2,6 +2,7 @@
 \usepackage{nott-titlepage}
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{amsmath}
 
 \title{EEEE3112 Coursework 2 Inverter Design}
 \author{Tan Hong Kai}
@@ -44,6 +45,48 @@ In this coursework, all the calculations are done in a Matlab live script.
 Furthermore, the live script also contains the code for the control design and analysis.
 Using a live script allows for quick calculations of values if any changes were made and the built-in markup makes the code organize.
 Once the values for the inverter are calculated, the inverter is then modelled and simulated in PLECS to evaluate the performance.
+
+\subsection{Inductor Design}
+
+The first part of an inverter design is designing the inductor.
+The inductor sits between the inverter and the AC grid.
+It acts as a filter to the high frequency of the inverter.
+Furthermore, the inductor acts as a load with low losses to allow for power transfer.
+
+The main components that effects the inductor design is the AC current ripple $\Delta{I}$.
+However, there are other components such as the switching period and DC input voltage which are usually fixed.
+Formula \ref{eq:inductor} shows how the inductor size is calculated.
+Where $T_{s}$ is the switching period $\frac{1}{f_{sw}}$.
+
+\begin{equation} \label{eq:inductor}
+    L = \frac{T_{s} V_{DC}}{8 \Delta{I}} = \frac{0.00005 * 600}{8 * 0.5} = 7.5 mH
+\end{equation}
+
+Inductors are not ideal and has some resistance in it.
+In this coursework, the resistance of the inductor contributes to 1\% of the rated power.
+It can be calculated using the power loss equation:
+
+\begin{equation}
+    \begin{aligned}
+        P_{LOSS} & = I^{2} R                \\
+        R        & = \frac{P_{LOSS}}{I^{2}}
+    \end{aligned}
+\end{equation}
+
+Where:
+
+\begin{equation}
+    \begin{aligned}
+        I      & = \frac{\sqrt{P^{2} + Q_{AC}^{2}}}{V_{AC}} = \frac{\sqrt{3000^{2} + 0^{2}}}{240} = 12.5 A \\
+        \varphi & = -\arctan(\frac{Q_{AC}}{P_{AC}}) = -\arctan(0) = 0^{\circ{}}
+    \end{aligned}
+\end{equation}
+
+Therefore:
+
+\begin{equation}
+    R = \frac{0.01 * 3000}{12.5^{2}} = 0.192 \Omega
+\end{equation}
 
 \section{Results and Discussion}
 
