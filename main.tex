@@ -77,7 +77,7 @@ Where:
 
 \begin{equation}
     \begin{aligned}
-        I      & = \frac{\sqrt{P^{2} + Q_{AC}^{2}}}{V_{AC}} = \frac{\sqrt{3000^{2} + 0^{2}}}{240} = 12.5 A \\
+        I       & = \frac{\sqrt{P^{2} + Q_{AC}^{2}}}{V_{AC}} = \frac{\sqrt{3000^{2} + 0^{2}}}{240} = 12.5 A \\
         \varphi & = -\arctan(\frac{Q_{AC}}{P_{AC}}) = -\arctan(0) = 0^{\circ{}}
     \end{aligned}
 \end{equation}
@@ -86,6 +86,31 @@ Therefore:
 
 \begin{equation}
     R = \frac{0.01 * 3000}{12.5^{2}} = 0.192 \Omega
+\end{equation}
+
+\subsection{Inverter Voltage}
+
+The power delivered by the inverter to the grid is based on the inverter voltage $V_{INV}$.
+Inverter voltage is mainly effected by the current delivered $I$ and inductor impedance $Z$.
+The inverter voltage can be calculated using formula \ref{eq:v-inv}.
+Note that all the values are calculated in the phasor representation.
+
+\begin{equation} \label{eq:v-inv}
+    \begin{aligned}
+        \dot{Z}       & = \omega{L}j = 2 * \pi * 50 * 7.5m * j = 2.356j \Omega                   \\
+        \dot{V}_{INV} & = \dot{I} \dot{Z} + \dot{V}_{AC} = 12.5 * 2.356j + 240 = 240 + 29.452j V
+    \end{aligned}
+\end{equation}
+
+The time domain equation can be obtained by converting it from the phasor representation.
+
+\begin{equation}
+    \begin{aligned}
+        V_{INV}       & = \sqrt{240^2 + 29.452^2} = 241.800 V                                                  \\
+        \hat{V}_{INV} & = V_{INV} * \sqrt(2) = 341.957 V                                                       \\
+        \gamma        & = \arctan(\frac{29.452}{240}) = 6.996^{\circ{}}                                        \\
+        V_{INV}(t)    & = \hat{V}_{INV} \sin(\omega{t} + \gamma{}) = 341.957 \sin(\omega{t} + 6.996^{\circ{}})
+    \end{aligned}
 \end{equation}
 
 \section{Results and Discussion}
