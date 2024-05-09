@@ -5,6 +5,7 @@
 \usepackage{amsmath}
 \usepackage{hyperref}
 % https://tex.stackexchange.com/questions/32598/force-latex-image-to-appear-in-the-section-in-which-its-declared
+% https://tex.stackexchange.com/questions/279/how-do-i-ensure-that-figures-appear-in-the-section-theyre-associated-with
 \usepackage[section]{placeins}
 
 \title{EEEE3112 Coursework 2 Inverter Design}
@@ -23,7 +24,7 @@ This coursework explores the design of DC to AC inverter.
 The inverter is a single-phase grid connected inverter facing a solar power network.
 The design specification of the inverter is shown in table \ref{tab:design-spec}.
 
-\begin{table}[H]
+\begin{table}[ht]
     \caption{Design Specification of the Inverter}
     \label{tab:design-spec}
     \centering{}
@@ -123,22 +124,25 @@ The inverter is then connected to the grid with the inductor calculated in betwe
 Measurements of the inverter current and AC grid voltage is taken to calculate the power output.
 Figure \ref{fig:avg-time-waveform} shows the output wave forms of the inverter and the average output power.
 
-\begin{figure}[H]
-    \includegraphics[width=\textwidth]{img/Average Time Power.pdf}
-    \caption{Output Waveforms of the Average Time Model Inverter}
-    \label{fig:avg-time-waveform}
-\end{figure}
-
-\begin{figure}[H]
-    \includegraphics[width=\textwidth]{img/Average Timer Power Cursor.jpg}
-    \caption{Measurements from the Average Time Model Waveform}
-    \label{fig:avg-time-cursor}
-\end{figure}
-
 The waveforms show that the power output of the inverter matches with the calculated values.
 The average power of the inverter is around 2980 W.
 This is close to the expected power of $3000 - 1\% * 3000 = 3000 - 30 = 2970$ W.
 The difference is due to the precision of the calculated and input values to PLECS.
+
+\begin{figure}[ht]
+    % https://tex.stackexchange.com/questions/47245/set-a-maximum-width-and-height-for-an-image/47247
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Average Time Power.pdf}
+    \caption{Output Waveforms of the Average Time Model Inverter}
+    \label{fig:avg-time-waveform}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Average Timer Power Cursor.jpg}
+    \caption{Measurements from the Average Time Model Waveform}
+    \label{fig:avg-time-cursor}
+\end{figure}
 
 \section{Switching Model}
 
@@ -162,7 +166,7 @@ Where:
     \end{aligned}
 \end{equation}
 
-\begin{figure}
+\begin{figure}[ht]
     \centering{}
     \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Switching Model.pdf}
     \caption{PLECS Model for the Switching Model}
@@ -172,14 +176,14 @@ Where:
 In figure \ref{fig:switching-waveform} and \ref{fig:switching-cursor}, the output current and voltage is measured, and the power is calculated.
 The calculated average power output is the same as the one in the \hyperref[sec:avg-time-model]{average time model}.
 
-\begin{figure}
+\begin{figure}[ht]
     \centering{}
     \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Switching Power.pdf}
     \caption{Output Waveforms of the Switching Model Inverter}
     \label{fig:switching-waveform}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[ht]
     \centering{}
     \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Switching Power Cursor.jpg}
     \caption{Measurements from the Switching Model Waveform}
@@ -200,14 +204,14 @@ This is 2 times of the switching frequency.
 The inverter output voltage consists of the combination of two half bridges switching at 20 kHz.
 When the output of both half bridge combined the 20 kHz harmonics add up to 40 kHz causing the frequency spike at the Fourier analysis.
 
-\begin{figure}
+\begin{figure}[ht]
     \centering{}
     \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Switching Inverter Voltage.pdf}
     \caption{Output Waveforms of the Inverter Voltage}
     \label{fig:switching-inverter-voltage}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[ht]
     \centering{}
     \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Switching Demand FFT.pdf}
     \caption{Fourier Analysis of the Inverter Voltage}
@@ -218,7 +222,7 @@ The inductor ripple is also considered in the simulation.
 Figure \ref{fig:switching-current-ripple} shows the inductor current ripple graph.
 From the simulation, the peak to peak current ripple is measured to be 0.491 A which is within the 0.5 A requirement.
 
-\begin{figure}
+\begin{figure}[ht]
     \centering{}
     \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Switching Current Ripple.pdf}
     \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Switching Current Ripple Cursor.jpg}
