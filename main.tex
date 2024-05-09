@@ -39,14 +39,12 @@ The design specification of the inverter is shown in table \ref{tab:design-spec}
     \end{tabular}
 \end{table}
 
-\section{Methodology and Assumptions}
-
 In this coursework, all the calculations are done in a Matlab live script.
 Furthermore, the live script also contains the code for the control design and analysis.
 Using a live script allows for quick calculations of values if any changes were made and the built-in markup makes the code organize.
 Once the values for the inverter are calculated, the inverter is then modelled and simulated in PLECS to evaluate the performance.
 
-\subsection{Inductor Design}
+\section{Inductor Design}
 
 The first part of an inverter design is designing the inductor.
 The inductor sits between the inverter and the AC grid.
@@ -88,7 +86,7 @@ Therefore:
     R = \frac{0.01 * 3000}{12.5^{2}} = 0.192 \Omega
 \end{equation}
 
-\subsection{Inverter Voltage}
+\section{Inverter Voltage}
 
 The power delivered by the inverter to the grid is based on the inverter voltage $V_{INV}$.
 Inverter voltage is mainly effected by the current delivered $I$ and inductor impedance $Z$.
@@ -113,6 +111,16 @@ The time domain equation can be obtained by converting it from the phasor repres
     \end{aligned}
 \end{equation}
 
-\section{Results and Discussion}
+\section{Average Time Model}
+
+\section{Switching Model}
+
+\section{Transfer Function Model}
+
+\section{Continuous Current Control Model}
+
+\section{Discrete Current Control Model}
+
+\section{Conclusion}
 
 \end{document}
