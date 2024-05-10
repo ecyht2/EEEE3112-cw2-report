@@ -240,6 +240,41 @@ From the simulation, the peak to peak current ripple is measured to be 0.491 A w
 
 \section{Transfer Function Model}
 
+A transfer function model is also considered.
+The entire inverter system is modelled as a plant with the voltage demand as the input and the current to the grid as output.
+The transfer function is found to be a first order transfer function effected by the inductor and resistance loss of the inductor.
+Equation \ref{eq:plant-tf} shows the plant transfer function of the inverter $G(s)$.
+
+\begin{equation} \label{eq:plant-tf}
+    G(s) = \frac{1}{Ls + R} = \frac{1}{0.0075 s + 0.192}
+\end{equation}
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Transfer Function Model.pdf}
+    \caption{PLECS Schematic for Transfer Function Model}
+    \label{fig:tf-model}
+\end{figure}
+
+The power output of the system is measured like the previous two models.
+Figure \ref{fig:tf-waveform} shows the output wave form of the model.
+As seen in \ref{fig:tf-cursor}, the output power matches the other models.
+This shows that the calculated plant transfer function is correct.
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Transfer Function Power.pdf}
+    \caption{Output Waveforms of the Transfer Function Model Inverter}
+    \label{fig:tf-waveform}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Transfer Function Cursor.jpg}
+    \caption{Measurements from the Transfer Function Model Waveform}
+    \label{fig:tf-cursor}
+\end{figure}
+
 \section{Continuous Current Control Model}
 
 \section{Discrete Current Control Model}
