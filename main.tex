@@ -7,6 +7,7 @@
 % https://tex.stackexchange.com/questions/32598/force-latex-image-to-appear-in-the-section-in-which-its-declared
 % https://tex.stackexchange.com/questions/279/how-do-i-ensure-that-figures-appear-in-the-section-theyre-associated-with
 \usepackage[section]{placeins}
+\usepackage{listings}
 
 \title{EEEE3112 Coursework 2 Inverter Design}
 \author{Tan Hong Kai}
@@ -276,8 +277,144 @@ This shows that the calculated plant transfer function is correct.
 \end{figure}
 
 \section{Continuous Current Control Model}
+\label{sec:cont-cc-model}
 
 \section{Discrete Current Control Model}
+
+Controllers are usually run on a microcontroller.
+This means that the controller must be discrete.
+Therefore, a new controller is designed for the discrete domain.
+The data would be sampled at a sampling frequency of the switching frequency $f_{sw}$ (20 kHz).
+The discrete controller is designed to have a damping factor ($\zeta$) of 0.7 and natural frequency ($f_0$) of 500 Hz.
+
+The plant transfer function is first converted to the discrete domain.
+This is done using the \lstinline{c2d} function in Matlab.
+The \lstinline{c2d} function converts a given transfer function to the z-domain given a sampling frequency.
+Equation \ref{eq:plant-tf-z} shows the new discrete plant equation.
+Matlab sisotool is then used with the new plant equation to design the new controller.
+
+\begin{equation} \label{eq:plant-tf-z}
+    G(z) = \frac{0.006662}{z - 0.9987}
+\end{equation}
+
+Initially, a PI controller is used.
+Similar to the continuous controller, a PI controller cannot give the desired performance.
+Therefore, a PID controller is used shown in equation \ref{eq:pid-discrete}.
+
+\begin{equation} \label{eq:pid-discrete}
+    C(z) = 298 + 6.67e5 \frac{1}{f_{sw} (z - 1)} + 0.0258 f_{sw} (z - 1)
+\end{equation}
+
+In PLECS, a discrete controller can be implemented using the \lstinline[breaklines]{Discrete PID Controller} block.
+The same tests and models in \ref{sec:cont-cc-model} are created with the new controller.
+Figure \ref{fig:avg-time-z-c-model} shows the new average time model and figure \ref{fig:switching-z-c-model} shows the new switching model.
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Average Time Z-C Model.pdf}
+    \caption{PLECS Schematic for Average Time Discrete Controller Model}
+    \label{fig:avg-time-z-c-model}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Switching Z-C Model.pdf}
+    \caption{PLECS Schematic for Switching Discrete Controller Model}
+    \label{fig:switching-z-c-model}
+\end{figure}
+
+The new schematic is tested with the same test as \ref{sec:cont-cc-model}.
+Figure \ref{fig:avg-time-z-c-current} shows the output and reference current at power step of 0 W, $\frac{P}{2}$ W and $P$ W in average time model.
+Just like the continuous controller, the output current can mostly follow the reference current.
+However, at the beginning of each power transition (especially at 0 W), there is a high frequency ripple.
+This is due to the sampling time of the controller not being able to respond as quickly to changes.
+The negative power variants have similar patterns just with a phase shift.
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Average Time Z-C Current.pdf}
+    \caption{Reference Current vs Output Current Average Time Discrete Controller Model}
+    \label{fig:avg-time-z-c-current}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Average Time Z-C Ripple.pdf}
+    \caption{Current Ripple in Output Current Average Time Discrete Controller Model}
+    \label{fig:avg-time-z-c-current-ripple}
+\end{figure}
+
+The switching discrete controller model current also look similar to the continuous counterpart.
+There are more current ripples compared to the continuous controller notably at 0 W.
+However, this is less obvious compared to the average time model as the switching frequency is the same as the sampling frequency.
+The faster reacting continuous controller is unable to follow the reference current that well as the switching frequency limits how fast the current can change.
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Switching Z-C Current.pdf}
+    \caption{Reference Current vs Output Current Switching Discrete Controller Model}
+    \label{fig:switching-z-c-current}
+\end{figure}
+
+Table \ref{tab:z-c-transient} shows the transient average power output compared to desired power.
+The transient average power output magnitude is higher than the continuous counterpart.
+This is due to the harmonics caused by the sample time of discrete controller.
+The harmonics contributed some additional power to the system, causing the power output to be higher than the desired output.
+
+\begin{table}[ht]
+    \caption{Transient Average Power Output of Inverter}
+    \label{tab:z-c-transient}
+    \centering{}
+    \begin{tabular}{ l l l }
+        \hline
+        Model        & Desired Power (W) & Output Power (W) \\
+        \hline
+        Average Time & $0$               & -3.333           \\
+        Average Time & $1500$            & 1498.26          \\
+        Average Time & $3000$            & 2999.85          \\
+        \hline
+        Average Time & $0$               & -3.333           \\
+        Average Time & $-1500$           & -1504.92         \\
+        Average Time & $-3000$           & -3006.52         \\
+        \hline
+        Switching    & $0$               & -3.329           \\
+        Switching    & $1500$            & 1498.27          \\
+        Switching    & $3000$            & 2999.86          \\
+        \hline
+        Switching    & $0$               & -3.329           \\
+        Switching    & $-1500$           & -1504.92         \\
+        Switching    & $-3000$           & -3006.52         \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Average Time Z-C Power Positive.pdf}
+    \caption{Desired Power vs Output Power Average Time Discrete Controller Positive}
+    \label{fig:avg-time-z-c-power-positive}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Average Time Z-C Power Negative.pdf}
+    \caption{Desired Power vs Output Power Average Time Discrete Controller Negative}
+    \label{fig:avg-time-z-c-power-negative}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Switching Z-C Power Positive.pdf}
+    \caption{Desired Power vs Output Power Switching Discrete Controller Positive}
+    \label{fig:switching-z-c-power-positive}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Switching Z-C Power Negative.pdf}
+    \caption{Desired Power vs Output Power Switching Discrete Controller Negative}
+    \label{fig:switching-z-c-power-negative}
+\end{figure}
 
 \section{Conclusion}
 
