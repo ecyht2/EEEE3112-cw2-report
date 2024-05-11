@@ -1,1 +1,3 @@
 {"rule":"MORFOLOGIK_RULE_EN_GB","sentence":"^\\QIn PLECS, a discrete controller can be implemented using the [breaklines]Discrete PID Controller block.\\E$"}
+{"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qblock = [draw, fill=white, rectangle, minimum height=3em, minimum width=6em] sum = [draw, fill=white, circle, node distance=1cm] input = [coordinate] output = [coordinate] pinstyle = [pin edge=to-, thin, black]\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_GB","sentence":"^\\Qblock = [draw, fill=white, rectangle, minimum height=3em, minimum width=6em] sum = [draw, fill=white, circle, node distance=1cm] input = [coordinate] output = [coordinate] pinstyle = [pin edge=to-, thin, black]\\E$"}

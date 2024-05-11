@@ -8,6 +8,8 @@
 % https://tex.stackexchange.com/questions/279/how-do-i-ensure-that-figures-appear-in-the-section-theyre-associated-with
 \usepackage[section]{placeins}
 \usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning}
 
 \title{EEEE3112 Coursework 2 Inverter Design}
 \author{Tan Hong Kai}
@@ -78,7 +80,7 @@ It can be calculated using the power loss equation:
 
 Where:
 
-\begin{equation}
+\begin{equation} \label{eq:current-calculation}
     \begin{aligned}
         I       & = \frac{\sqrt{P^{2} + Q_{AC}^{2}}}{V_{AC}} = \frac{\sqrt{3000^{2} + 0^{2}}}{240} = 12.5 A \\
         \varphi & = -\arctan(\frac{Q_{AC}}{P_{AC}}) = -\arctan(0) = 0^{\circ{}}
@@ -240,6 +242,7 @@ From the simulation, the peak to peak current ripple is measured to be 0.491 A w
 \end{figure}
 
 \section{Transfer Function Model}
+\label{sec:tf-model}
 
 A transfer function model is also considered.
 The entire inverter system is modelled as a plant with the voltage demand as the input and the current to the grid as output.
@@ -278,6 +281,204 @@ This shows that the calculated plant transfer function is correct.
 
 \section{Continuous Current Control Model}
 \label{sec:cont-cc-model}
+
+Due to the losses in the inductor and various unknown losses not in the simulation, the desired power is not outputted.
+A current controller is needed to control the output current from the inverter to reach desired output power.
+Using the transfer function found in \ref{sec:tf-model}, a current control block diagram can be created shown in figure \ref{fig:control-block-diagram}.
+
+% https://tex.stackexchange.com/questions/175969/block-diagrams-using-tikz
+\tikzstyle{block} = [draw, fill=white, rectangle,
+minimum height=3em, minimum width=6em]
+\tikzstyle{sum} = [draw, fill=white, circle, node distance=1cm]
+\tikzstyle{input} = [coordinate]
+\tikzstyle{output} = [coordinate]
+\tikzstyle{pinstyle} = [pin edge={to-, thin, black}]
+
+\begin{figure}
+    \centering{}
+    \begin{tikzpicture}[auto, node distance=2cm,>=latex']
+        \node [input, name=input] {};
+        \node [sum, right of=input] (sum) {};
+        \node [block, right of=sum] (controller) {$C(s)$};
+        \node [sum, right=3em of controller, anchor=west] (disturbance) {};
+        \node [block, right=3em of disturbance,
+            node distance=3cm] (system) {$G(s)$};
+        \node [above=2em of disturbance] (V_AC) {$V_{AC}$};
+
+        \draw [->] (controller) -- node {$V_{INV}$} (disturbance) node[anchor=north east]{$+$} node[anchor=south west] {$-$};
+        \draw [->] (disturbance) -- node {$V_{L}$} (system);
+        \draw [->] (V_AC) -- (disturbance);
+        \node [output, right of=system] (output) {};
+        \coordinate [below of=disturbance] (measurements);
+
+        \draw [draw,->] (input) -- node {$I^{ref}$} (sum);
+        \draw [->] (sum) -- node {$e$} (controller);
+        \draw [->] (system) -- node [name=y] {$I$}(output);
+        \draw [->] (y) |- (measurements) -| node[pos=0.99] {$-$}
+        node [near end] {$I$} (sum);
+    \end{tikzpicture}
+    \caption{Control Block Diagram}
+    \label{fig:control-block-diagram}
+\end{figure}
+
+A current controller with a damping factor ($\zeta$) of 0.7 and natural frequency ($f_0$) of 500 Hz.
+This specification is shown such that the current controller would have a good settling and rise time with acceptable overshoot.
+The controller is implemented using sisotool in Matlab with the design requirements in mind.
+When designing the controller, an assumption is made that the controller operates at high frequency.
+Therefore, the disruption cause by the $V_{AC}$ can be ignored.
+
+A PI controller is originally chosen as the controller.
+This is due to the step response from the plant has a steady state error.
+However, when tuning the controller in sisotool, the PI controller is unable to reach the design requirement.
+Therefore, a PID controller is used instead.
+Equation \ref{eq:pid-continuous} shows the transfer function of the controller.
+
+\begin{equation} \label{eq:pid-continuous}
+    C(s) = 424 + 7.88e5 \frac{1}{s} + 0.0558 s
+\end{equation}
+
+The PID controller is implemented using the PID block in PLECS.
+The controller can then be easily implemented by inserting the correct $K_p$, $K_i$ and $K_d$ value.
+The PID controller block also has other functions such as anti-windup and filter, these are ignored and left as default value.
+Even though the controller can be implemented using transfer function blocks, it is not used due to the improper nature of the controller transfer function.
+
+The error signal for the PID controller is obtained by subtracting the grid current by the reference current.
+The reference current is calculated using the desired power, reactive power and grid voltage.
+It consists of a Phase-Lock-Loop (PLL) and current calculations.
+
+The PLL is used to recreate the phase of the grid and calculating the AC RMS voltage.
+PLL is implemented by using the Single-Phase PLL block.
+Some parameters are changed such as the nominal frequency and nominal input voltage.
+
+The current calculation is split into two separate parts, the amplitude calculation and the phase calculation.
+Equation \ref{eq:current-calculation} is used to calculate the current from the desired output power ($P_{AC}$), desired reactive power ($Q_{AC}$) and RMS $V_{AC}$.
+$P_{AC}$ and $Q_{AC}$ are supplied as constants while the AC RMS voltage is taken from the PLL output.
+The resultant reference current can be calculated using the sin/cos output from the PLL shown in equation \ref{eq:ref-current}.
+
+\begin{equation} \label{eq:ref-current}
+    I_{ref} = \hat{I} (\sin(\varphi)\cos(\omega{t}) + \cos(\varphi)\sin(\omega{t}))
+\end{equation}
+
+Where:
+
+$\sin(\omega{t})$ and $\cos(\omega{t})$ are the sin/cos output from the PLL.
+
+$\varphi$ is the phase of the desired current.
+
+$\hat{I}$ is the peak-to-peak of the desired current.
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Iref Calculation.pdf}
+    \caption{PLECS Schematic for Calculating $I_{ref}$}
+    \label{fig:iref-calculation}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Average Time C Model.pdf}
+    \caption{PLECS Schematic for Average Time Continuous Controller Model}
+    \label{fig:avg-time-c-model}
+\end{figure}
+
+Some modifications to the PWM circuit is made on the switching model.
+A zero-order hold with 10 times of the switching time sample time is added.
+This is to suppress errors due to the control signal switching too frequently
+A zero-order hold keeps a certain value for the given sample time, reducing the amount of time signal value changes.
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Switching C Model.pdf}
+    \caption{PLECS Schematic for Switching Continuous Controller Model}
+    \label{fig:switching-c-model}
+\end{figure}
+
+To test the performance of the controller two tests are done.
+The first test is asking the inverter to generate a power output of 0 W, then step to $\frac{P}{2}$ W, finally resting at $P$ W.
+The second test is similar, but the steps are at $-\frac{P}{2}$ W and $-P$ W.
+Table \ref{tab:c-transient} shows the transient average output power of the inverter.
+Figure \ref{fig:avg-time-c-power-positive}, \ref{fig:avg-time-c-power-negative}, \ref{fig:switching-c-power-positive}, and \ref{fig:switching-c-power-negative} shows the transient output power response of the inverter.
+
+\begin{table}[ht]
+    \caption{Transient Average Power Output of Inverter}
+    \label{tab:c-transient}
+    \centering{}
+    \begin{tabular}{ l l l }
+        \hline
+        Model        & Desired Power (W) & Output Power (W) \\
+        \hline
+        Average Time & $0$               & -3.783           \\
+        Average Time & $1500$            & 1497.57          \\
+        Average Time & $3000$            & 2998.92          \\
+        \hline
+        Average Time & $0$               & -3.783           \\
+        Average Time & $-1500$           & -1505.14         \\
+        Average Time & $-3000$           & -3006.49         \\
+        \hline
+        Switching    & $0$               & -3.840           \\
+        Switching    & $1500$            & 1497.52          \\
+        Switching    & $3000$            & 2998.88          \\
+        \hline
+        Switching    & $0$               & -3.840           \\
+        Switching    & $-1500$           & -1505.20         \\
+        Switching    & $-3000$           & -3006.56         \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Average Time C Power Positive.pdf}
+    \caption{Desired Power vs Output Power Average Time Continuous Controller Positive}
+    \label{fig:avg-time-c-power-positive}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Average Time C Power Negative.pdf}
+    \caption{Desired Power vs Output Power Average Time Continuous Controller Negative}
+    \label{fig:avg-time-c-power-negative}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Switching C Power Positive.pdf}
+    \caption{Desired Power vs Output Power Switching Continuous Controller Positive}
+    \label{fig:switching-c-power-positive}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Switching C Power Negative.pdf}
+    \caption{Desired Power vs Output Power Switching Continuous Controller Negative}
+    \label{fig:switching-c-power-negative}
+\end{figure}
+
+As shown in table \ref{tab:c-transient}, the average transient output power is not exactly the same.
+This is due to the controller not being able to match the exact current reference.
+The output current is similar to the reference current (see \ref{fig:switching-c-current}), but there is some offset.
+The offset is mostly cause by the grid voltage.
+This is especially true when the power of 0 W.
+The grid voltage interfere with the inverter voltage causing a mismatch in current.
+
+Both average time and switching model can follow the reference current.
+However, the switching model output current has high frequency ripple caused by the switching.
+This is especially obvious when the target power is 0 W, resulting in a sausage like shape.
+Figure \ref{fig:switching-c-current-ripple} shows the sausage ripple current in the switching model.
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Average Time C Current.pdf}
+    \caption{Desired Current vs Output Current of Inverter}
+    \label{fig:switching-c-current}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering{}
+    \includegraphics[width=\textwidth, height=0.4\textheight, keepaspectratio]{img/Switching C Current Ripple.pdf}
+    \caption{Sausage Current Ripple in the Switching Model}
+    \label{fig:switching-c-current-ripple}
+\end{figure}
 
 \section{Discrete Current Control Model}
 
