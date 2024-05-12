@@ -619,4 +619,20 @@ The harmonics contributed some additional power to the system, causing the power
 
 \section{Conclusion}
 
+This coursework successfully created and simulated an inverter with good performance.
+The design process starts with the design of inductor and calculation of the inverter voltage required for the power delivery.
+Then, the component values calculated are simulated in 7 different models.
+
+The first three models tests the inverter with an open loop control.
+The models include the average time model without any switching, the switching model with IGBT switching and the transfer function model based on the transfer function of the inverter.
+The last four are closed loop controlled inverters.
+Two different types of controllers are design for these models.
+The first controller is the continuous model with transfer functions connected to the average time and switching model.
+The second controller is the discrete model in the z-domain connected to the average time and switching model.
+
+All the models are simulated using PLECS and their performance are evaluated.
+The models are evaluated using 2 key factors.
+The first factor is the output power and the second is the output current.
+The PLECS simulation showed that the inverter designed is able to provide the rated power at steady state and current below the current ripple requirements, proving the designed inverter has good performance.
+
 \end{document}
