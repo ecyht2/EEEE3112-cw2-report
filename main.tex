@@ -16,7 +16,7 @@
 \date{May 13, 2024}
 \studentid{20386501}
 \module{EEEE3112 Power Electronic Applications and Control}
-\department{Department of Electrical and Electronics}
+\department{Department of Electrical and Electronics Engineering}
 
 \begin{document}
 \maketitle
@@ -55,8 +55,8 @@ Once the values for the inverter are calculated, the inverter is then modelled a
 
 The first part of an inverter design is designing the inductor.
 The inductor sits between the inverter and the AC grid.
-It acts as a filter to the high frequency of the inverter.
-Furthermore, the inductor acts as a load with low losses to allow for power transfer.
+It acts as a filter to the high frequency switching of the inverter.
+Furthermore, the inductor acts as a load with low losses allowing power transfer with the grid.
 
 The main components that effects the inductor design is the AC current ripple $\Delta{I}$.
 However, there are other components such as the switching period and DC input voltage which are usually fixed.
@@ -68,7 +68,7 @@ Where $T_{s}$ is the switching period $\frac{1}{f_{sw}}$.
 \end{equation}
 
 Inductors are not ideal and has some resistance in it.
-In this coursework, the resistance of the inductor contributes to 1\% of the rated power.
+In this coursework, the resistance of the inductor takes up 1\% of the rated power.
 It can be calculated using the power loss equation:
 
 \begin{equation}
@@ -213,7 +213,7 @@ The value is not at 50 Hz due to the resolution of the frequency axis when sampl
 The second frequency spike occurs at about 40 kHz.
 This is 2 times of the switching frequency.
 The inverter output voltage consists of the combination of two half bridges switching at 20 kHz.
-When the output of both half bridge combined the 20 kHz harmonics add up to 40 kHz causing the frequency spike at the Fourier analysis.
+When the output of both half bridge is combined, the 20 kHz harmonics add up to 40 kHz causing the frequency spike at the Fourier analysis.
 
 \begin{figure}[ht]
     \centering{}
@@ -282,7 +282,7 @@ This shows that the calculated plant transfer function is correct.
 \section{Continuous Current Control Model}
 \label{sec:cont-cc-model}
 
-Due to the losses in the inductor and various unknown losses not in the simulation, the desired power is not outputted.
+Due to the losses in the inductor and various losses not considered in the simulation, the desired power might not be outputted in a real inverter.
 A current controller is needed to control the output current from the inverter to reach desired output power.
 Using the transfer function found in \ref{sec:tf-model}, a current control block diagram can be created shown in figure \ref{fig:control-block-diagram}.
 
@@ -321,14 +321,14 @@ minimum height=3em, minimum width=6em]
     \label{fig:control-block-diagram}
 \end{figure}
 
-A current controller with a damping factor ($\zeta$) of 0.7 and natural frequency ($f_0$) of 500 Hz.
-This specification is shown such that the current controller would have a good settling and rise time with acceptable overshoot.
+A current controller with a damping factor ($\zeta$) of 0.7 and natural frequency ($f_0$) of 500 Hz is designed.
+This specification is chosen such that the current controller would have a good settling and rise time with acceptable overshoot.
 The controller is implemented using sisotool in Matlab with the design requirements in mind.
 When designing the controller, an assumption is made that the controller operates at high frequency.
 Therefore, the disruption cause by the $V_{AC}$ can be ignored.
 
-A PI controller is originally chosen as the controller.
-This is due to the step response from the plant has a steady state error.
+A PI controller was originally chosen as the controller.
+This is due to the step response from the plant having a steady-state error.
 However, when tuning the controller in sisotool, the PI controller is unable to reach the design requirement.
 Therefore, a PID controller is used instead.
 Equation \ref{eq:pid-continuous} shows the transfer function of the controller.
@@ -340,11 +340,11 @@ Equation \ref{eq:pid-continuous} shows the transfer function of the controller.
 The PID controller is implemented using the PID block in PLECS.
 The controller can then be easily implemented by inserting the correct $K_p$, $K_i$ and $K_d$ value.
 The PID controller block also has other functions such as anti-windup and filter, these are ignored and left as default value.
-Even though the controller can be implemented using transfer function blocks, it is not used due to the improper nature of the controller transfer function.
+Even though the controller can be implemented using transfer function blocks, it is not used due to the improper nature of the controller transfer function which PLECS does not allow.
 
 The error signal for the PID controller is obtained by subtracting the grid current by the reference current.
 The reference current is calculated using the desired power, reactive power and grid voltage.
-It consists of a Phase-Lock-Loop (PLL) and current calculations.
+It consists of a Phase-Lock-Loop (PLL) and current calculation blocks.
 
 The PLL is used to recreate the phase of the grid and calculating the AC RMS voltage.
 PLL is implemented by using the Single-Phase PLL block.
@@ -381,10 +381,10 @@ $\hat{I}$ is the peak-to-peak of the desired current.
     \label{fig:avg-time-c-model}
 \end{figure}
 
-Some modifications to the PWM circuit is made on the switching model.
-A zero-order hold with 10 times of the switching time sample time is added.
-This is to suppress errors due to the control signal switching too frequently
-A zero-order hold keeps a certain value for the given sample time, reducing the amount of time signal value changes.
+Some modifications to the PWM circuit is made to the switching model.
+A zero-order hold with the parameter sample time set to 10 times of the switching time is added.
+This is to suppress errors due to the control signal switching too frequently.
+A zero-order hold keeps a certain value for the given sample time, reducing the amount of times the signal value changes.
 
 \begin{figure}[ht]
     \centering{}
@@ -396,11 +396,11 @@ A zero-order hold keeps a certain value for the given sample time, reducing the 
 To test the performance of the controller two tests are done.
 The first test is asking the inverter to generate a power output of 0 W, then step to $\frac{P}{2}$ W, finally resting at $P$ W.
 The second test is similar, but the steps are at $-\frac{P}{2}$ W and $-P$ W.
-Table \ref{tab:c-transient} shows the transient average output power of the inverter.
+Table \ref{tab:c-transient} shows the steady-state average output power of the inverter.
 Figure \ref{fig:avg-time-c-power-positive}, \ref{fig:avg-time-c-power-negative}, \ref{fig:switching-c-power-positive}, and \ref{fig:switching-c-power-negative} shows the transient output power response of the inverter.
 
 \begin{table}[ht]
-    \caption{Transient Average Power Output of Inverter}
+    \caption{Steady-State Average Power Output of Inverter}
     \label{tab:c-transient}
     \centering{}
     \begin{tabular}{ l l l }
@@ -548,7 +548,7 @@ The negative power variants have similar patterns just with a phase shift.
 The switching discrete controller model current also look similar to the continuous counterpart.
 There are more current ripples compared to the continuous controller notably at 0 W.
 However, this is less obvious compared to the average time model as the switching frequency is the same as the sampling frequency.
-The faster reacting continuous controller is unable to follow the reference current that well as the switching frequency limits how fast the current can change.
+The faster reacting continuous controller is unable to follow the reference current that well as the switching frequency limiting how fast the current can change.
 
 \begin{figure}[ht]
     \centering{}
@@ -557,13 +557,16 @@ The faster reacting continuous controller is unable to follow the reference curr
     \label{fig:switching-z-c-current}
 \end{figure}
 
-Table \ref{tab:z-c-transient} shows the transient average power output compared to desired power.
-The transient average power output magnitude is higher than the continuous counterpart.
-This is due to the harmonics caused by the sample time of discrete controller.
-The harmonics contributed some additional power to the system, causing the power output to be higher than the desired output.
+Table \ref{tab:z-c-transient} shows the steady-state average power output compared to desired power.
+The steady-state average power output is closer to the desired power than the continuous counterpart.
+This is due to the sampling frequency of the discrete PID.
+The continuous model has a constant over-shoot of current from the controller design.
+This overshoot strays the output power away from the actual desired power, causing the performance to degrade by a little.
+In the discrete model however, the controller still has an overshoot.
+However, during the downtime of the controller, the current goes back down, bringing the current closer to the desired value.
 
 \begin{table}[ht]
-    \caption{Transient Average Power Output of Inverter}
+    \caption{Steady-State Average Power Output of Inverter}
     \label{tab:z-c-transient}
     \centering{}
     \begin{tabular}{ l l l }
@@ -624,15 +627,16 @@ The design process starts with the design of inductor and calculation of the inv
 Then, the component values calculated are simulated in 7 different models.
 
 The first three models tests the inverter with an open loop control.
-The models include the average time model without any switching, the switching model with IGBT switching and the transfer function model based on the transfer function of the inverter.
+The models include the average time model without any switching, the switching model with IGBT switches and the transfer function model based on the transfer function of the inverter.
 The last four are closed loop controlled inverters.
 Two different types of controllers are design for these models.
-The first controller is the continuous model with transfer functions connected to the average time and switching model.
-The second controller is the discrete model in the z-domain connected to the average time and switching model.
+The first controller is the continuous controller with transfer functions.
+The second controller is the discrete controller in the z-domain.
+Both of the controllers are then tested with the average time and switching models.
 
 All the models are simulated using PLECS and their performance are evaluated.
 The models are evaluated using 2 key factors.
 The first factor is the output power and the second is the output current.
-The PLECS simulation showed that the inverter designed is able to provide the rated power at steady state and current below the current ripple requirements, proving the designed inverter has good performance.
+The PLECS simulation showed that the inverter designed is able to provide the rated power at steady-state and current below the current ripple requirements, showing the designed inverter has good performance.
 
 \end{document}
